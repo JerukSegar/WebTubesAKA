@@ -3,215 +3,186 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analisis Merge Sort Rekursif vs Iteratif</title>
+    <title>Analisis Kompleksitas: Merge Sort Rekursif vs Iteratif</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         body {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            color: #e6e6e6;
-            min-height: 100vh;
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
             padding: 20px;
         }
         
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
         }
         
         header {
             text-align: center;
-            margin-bottom: 40px;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eaeaea;
         }
         
         h1 {
-            color: #64b5f6;
-            font-size: 2.5rem;
+            color: #2c3e50;
+            font-size: 2.2rem;
             margin-bottom: 10px;
         }
         
         .subtitle {
-            color: #90a4ae;
-            font-size: 1.2rem;
+            color: #7f8c8d;
+            font-size: 1.1rem;
         }
         
         .info-box {
-            background: rgba(30, 60, 114, 0.3);
-            border-left: 5px solid #64b5f6;
-            padding: 15px;
-            margin: 20px 0;
+            background: #f1f8ff;
+            border: 1px solid #d1e9ff;
             border-radius: 8px;
+            padding: 20px;
+            margin: 25px 0;
         }
         
-        .controls {
-            background: rgba(255, 255, 255, 0.05);
+        .controls-panel {
+            background: #f8f9fa;
+            border: 1px solid #eaeaea;
+            border-radius: 8px;
             padding: 25px;
-            border-radius: 12px;
             margin-bottom: 30px;
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 25px;
-            align-items: center;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        label {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 0.95rem;
         }
         
         .slider-container {
-            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
         
-        .slider-label {
+        .slider-header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 10px;
-            font-weight: bold;
-            color: #bb86fc;
+            align-items: center;
         }
         
         .slider-value {
-            background: #1e3a8a;
-            padding: 2px 10px;
-            border-radius: 12px;
+            background: #2c3e50;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
             font-weight: bold;
-            color: #64b5f6;
+            font-size: 0.9rem;
         }
         
         input[type="range"] {
             width: 100%;
-            height: 10px;
+            height: 6px;
             -webkit-appearance: none;
-            background: linear-gradient(to right, #1e3a8a, #3b82f6);
-            border-radius: 5px;
+            background: #ddd;
+            border-radius: 3px;
             outline: none;
         }
         
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            width: 24px;
-            height: 24px;
-            background: #64b5f6;
+            width: 20px;
+            height: 20px;
+            background: #3498db;
             border-radius: 50%;
             cursor: pointer;
-            border: 3px solid #1e3a8a;
-            box-shadow: 0 0 10px rgba(100, 181, 246, 0.5);
+            border: 3px solid white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+        
+        select {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background: white;
+            font-size: 1rem;
+            color: #333;
+            cursor: pointer;
         }
         
         .buttons {
             display: flex;
             gap: 15px;
             justify-content: center;
+            align-items: flex-end;
         }
         
         button {
-            padding: 14px 28px;
+            padding: 12px 25px;
             border: none;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            font-weight: bold;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            min-width: 200px;
-            justify-content: center;
+            transition: all 0.2s;
+            min-width: 160px;
         }
         
         .btn-run {
-            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+            background: #3498db;
             color: white;
         }
         
         .btn-run:hover {
-            background: linear-gradient(135deg, #1d4ed8, #2563eb);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
+            background: #2980b9;
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(52, 152, 219, 0.3);
         }
         
         .btn-reset {
-            background: rgba(255, 255, 255, 0.1);
-            color: #e6e6e6;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: #95a5a6;
+            color: white;
         }
         
         .btn-reset:hover {
-            background: rgba(255, 255, 255, 0.15);
-            transform: translateY(-2px);
-        }
-        
-        .chart-container {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 25px;
-            border-radius: 12px;
-            margin-bottom: 30px;
-            height: 500px;
-            position: relative;
-        }
-        
-        .results {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 25px;
-            border-radius: 12px;
-            margin-bottom: 30px;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-        
-        th, td {
-            padding: 15px;
-            text-align: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        th {
-            background: rgba(30, 60, 114, 0.5);
-            color: #64b5f6;
-            font-weight: bold;
-        }
-        
-        tr:hover {
-            background: rgba(255, 255, 255, 0.03);
-        }
-        
-        .time-cell {
-            font-family: 'Courier New', monospace;
-            font-weight: bold;
-        }
-        
-        .recursive-time {
-            color: #f87171;
-        }
-        
-        .iterative-time {
-            color: #4ade80;
+            background: #7f8c8d;
+            transform: translateY(-1px);
         }
         
         .loading {
             display: none;
             text-align: center;
-            padding: 20px;
-            color: #64b5f6;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            margin: 20px 0;
         }
         
         .spinner {
-            border: 5px solid rgba(100, 181, 246, 0.2);
-            border-top: 5px solid #64b5f6;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
             border-radius: 50%;
-            width: 50px;
-            height: 50px;
+            width: 40px;
+            height: 40px;
             animation: spin 1s linear infinite;
             margin: 0 auto 15px;
         }
@@ -221,7 +192,67 @@
             100% { transform: rotate(360deg); }
         }
         
-        .algorithm-info {
+        .chart-container {
+            background: white;
+            border: 1px solid #eaeaea;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            height: 450px;
+            position: relative;
+        }
+        
+        .results-container {
+            background: #f8f9fa;
+            border: 1px solid #eaeaea;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        
+        th, td {
+            padding: 14px 15px;
+            text-align: center;
+            border-bottom: 1px solid #eaeaea;
+        }
+        
+        th {
+            background: #2c3e50;
+            color: white;
+            font-weight: 600;
+        }
+        
+        tr:hover {
+            background: #f5f5f5;
+        }
+        
+        .time-cell {
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-weight: bold;
+        }
+        
+        .recursive-time {
+            color: #e74c3c;
+        }
+        
+        .iterative-time {
+            color: #27ae60;
+        }
+        
+        .algorithm-comparison {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 20px;
@@ -229,41 +260,55 @@
         }
         
         .card {
-            background: rgba(30, 60, 114, 0.3);
+            background: white;
+            border: 1px solid #eaeaea;
+            border-radius: 8px;
             padding: 20px;
-            border-radius: 10px;
-            border-top: 4px solid;
-        }
-        
-        .card-recursive {
-            border-color: #f87171;
-        }
-        
-        .card-iterative {
-            border-color: #4ade80;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
         
         .card h3 {
-            color: #64b5f6;
+            color: #2c3e50;
             margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid;
         }
         
-        .complexity {
+        .card-recursive h3 {
+            border-color: #e74c3c;
+        }
+        
+        .card-iterative h3 {
+            border-color: #27ae60;
+        }
+        
+        .card p {
+            margin: 8px 0;
+            color: #555;
+        }
+        
+        .complexity-badge {
             display: inline-block;
-            background: rgba(100, 181, 246, 0.2);
-            color: #64b5f6;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            margin-top: 10px;
+            background: #ecf0f1;
+            color: #2c3e50;
+            padding: 5px 15px;
+            border-radius: 4px;
+            font-family: monospace;
             font-weight: bold;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .data-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            border-left: 4px solid #3498db;
         }
         
         @media (max-width: 768px) {
-            .controls {
+            .controls-panel {
                 grid-template-columns: 1fr;
             }
             
@@ -276,7 +321,7 @@
             }
             
             .chart-container {
-                height: 400px;
+                height: 350px;
             }
         }
     </style>
@@ -284,34 +329,51 @@
 <body>
     <div class="container">
         <header>
-            <h1>📊 Analisis Merge Sort Rekursif vs Iteratif</h1>
-            <p class="subtitle">Studi Kasus: Pengurutan Data Penjualan Toko Online Berdasarkan Kategori</p>
+            <h1>Analisis Kompleksitas Algoritma Merge Sort</h1>
+            <p class="subtitle">Perbandingan Implementasi Rekursif vs Iteratif untuk Pengurutan Data E-commerce</p>
         </header>
         
         <div class="info-box">
-            <p>Web ini mensimulasikan perbandingan waktu eksekusi antara implementasi <strong>rekursif</strong> dan <strong>iteratif</strong> dari algoritma Merge Sort. 
-            Geser slider untuk mengubah jumlah data, lalu klik "Jalankan Pengujian" untuk melihat perbandingan waktu eksekusi.</p>
+            <p><strong>Deskripsi Studi Kasus:</strong> Analisis perbandingan waktu eksekusi antara implementasi rekursif (top-down) dan iteratif (bottom-up) dari algoritma Merge Sort pada data penjualan toko online. Data di-generate secara acak dengan berbagai kategori produk dan nilai penjualan.</p>
         </div>
         
-        <div class="controls">
-            <div class="slider-container">
-                <div class="slider-label">
-                    <span>Jumlah Data (n):</span>
-                    <span class="slider-value" id="dataSizeValue">5000</span>
+        <div class="controls-panel">
+            <div class="control-group">
+                <div class="slider-container">
+                    <div class="slider-header">
+                        <label for="dataSize">Jumlah Total Data (n):</label>
+                        <span class="slider-value" id="dataSizeValue">20,000</span>
+                    </div>
+                    <input type="range" id="dataSize" min="1000" max="100000" step="1000" value="20000">
+                    <div style="font-size: 0.85rem; color: #666;">
+                        Rentang: 1,000 - 100,000 data
+                    </div>
                 </div>
-                <input type="range" id="dataSize" min="1000" max="10000" step="100" value="5000">
-                <div class="slider-label">
-                    <span>Rentang: 1.000 - 10.000 data</span>
-                    <span>(Kategori: Sofa, Penjualan: 1-200)</span>
+            </div>
+            
+            <div class="control-group">
+                <label for="categoryFilter">Filter Kategori:</label>
+                <select id="categoryFilter">
+                    <option value="sofa">Sofa</option>
+                    <option value="tv">TV</option>
+                    <option value="meja">Meja</option>
+                    <option value="kursi">Kursi</option>
+                    <option value="lemari">Lemari</option>
+                    <option value="kasur">Kasur</option>
+                    <option value="laptop">Laptop</option>
+                    <option value="smartphone">Smartphone</option>
+                </select>
+                <div style="font-size: 0.85rem; color: #666;">
+                    Data akan difilter hanya untuk kategori terpilih
                 </div>
             </div>
             
             <div class="buttons">
                 <button class="btn-run" onclick="runTests()">
-                    <span>🚀 Jalankan Pengujian</span>
+                    Jalankan Pengujian
                 </button>
                 <button class="btn-reset" onclick="resetChart()">
-                    <span>🔄 Reset Grafik</span>
+                    Reset Grafik
                 </button>
             </div>
         </div>
@@ -319,50 +381,66 @@
         <div class="loading" id="loading">
             <div class="spinner"></div>
             <p>Menjalankan pengujian... Harap tunggu.</p>
-            <p><small>Waktu eksekusi tergantung jumlah data dan performa browser</small></p>
+            <p style="font-size: 0.9rem; color: #666;">Waktu eksekusi tergantung jumlah data dan performa browser</p>
+        </div>
+        
+        <div class="data-info" id="dataInfo">
+            <strong>Informasi Data:</strong> Menggunakan <span id="totalData">20,000</span> data total. Filter aktif untuk kategori "<span id="currentCategory">sofa</span>". 
+            Hasil filter: <span id="filteredCount">0</span> data.
         </div>
         
         <div class="chart-container">
             <canvas id="timeChart"></canvas>
         </div>
         
-        <div class="results">
-            <h2>📈 Hasil Pengujian Terbaru</h2>
+        <div class="results-container">
+            <div class="results-header">
+                <h2>Hasil Pengujian</h2>
+                <div style="font-size: 0.9rem; color: #666;">
+                    Waktu dalam milidetik (ms)
+                </div>
+            </div>
             <table id="resultsTable">
                 <thead>
                     <tr>
-                        <th>Jumlah Data (n)</th>
+                        <th>Jumlah Data</th>
                         <th>Merge Sort Rekursif</th>
                         <th>Merge Sort Iteratif</th>
-                        <th>Perbedaan Waktu</th>
-                        <th>Rasio (Rek/Iter)</th>
+                        <th>Perbedaan</th>
+                        <th>Rasio (Rekursif/Iteratif)</th>
                     </tr>
                 </thead>
                 <tbody id="resultsBody">
-                    <!-- Hasil akan ditampilkan di sini -->
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 30px; color: #95a5a6;">
+                            Belum ada data pengujian. Klik "Jalankan Pengujian" untuk memulai.
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         </div>
         
-        <div class="algorithm-info">
+        <div class="algorithm-comparison">
             <div class="card card-recursive">
-                <h3>🔄 Merge Sort Rekursif</h3>
-                <p><strong>Paradigma:</strong> Top-Down (Divide & Conquer)</p>
+                <h3>Merge Sort Rekursif (Top-Down)</h3>
+                <p><strong>Paradigma:</strong> Divide and Conquer</p>
                 <p><strong>Kompleksitas Waktu:</strong> O(n log n)</p>
-                <p><strong>Kompleksitas Ruang:</strong> O(n) + O(log n) stack</p>
-                <p><strong>Keunggulan:</strong> Implementasi lebih intuitif, mudah dipahami</p>
-                <p><strong>Kekurangan:</strong> Overhead panggilan rekursif, risiko stack overflow untuk n sangat besar</p>
-                <span class="complexity">O(n log n) — Stable Sort</span>
+                <p><strong>Kompleksitas Ruang:</strong> O(n) + O(log n) untuk stack</p>
+                <p><strong>Implementasi:</strong> Fungsi rekursif membagi array hingga elemen tunggal</p>
+                <p><strong>Overhead:</strong> Panggilan fungsi rekursif dan manajemen stack</p>
+                <p><strong>Keterbatasan:</strong> Risiko stack overflow untuk data sangat besar</p>
+                <span class="complexity-badge">O(n log n) - Stable Sort</span>
             </div>
             
             <div class="card card-iterative">
-                <h3>⚡ Merge Sort Iteratif</h3>
+                <h3>Merge Sort Iteratif (Bottom-Up)</h3>
                 <p><strong>Paradigma:</strong> Bottom-Up</p>
                 <p><strong>Kompleksitas Waktu:</strong> O(n log n)</p>
                 <p><strong>Kompleksitas Ruang:</strong> O(n)</p>
-                <p><strong>Keunggulan:</strong> Tidak ada overhead rekursi, lebih hemat memori</p>
-                <p><strong>Kekurangan:</strong> Implementasi lebih kompleks, kurang intuitif</p>
-                <span class="complexity">O(n log n) — Stable Sort</span>
+                <p><strong>Implementasi:</strong> Loop iteratif menggabungkan sub-array bertahap</p>
+                <p><strong>Overhead:</strong> Manajemen indeks dan variabel loop</p>
+                <p><strong>Keunggulan:</strong> Tidak ada batasan stack, lebih hemat memori</p>
+                <span class="complexity-badge">O(n log n) - Stable Sort</span>
             </div>
         </div>
     </div>
